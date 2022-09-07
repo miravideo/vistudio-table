@@ -5,12 +5,36 @@ import Store from "./store";
 
 const VERSION = '$VERSION';
 
+const innerSize = (element) => {
+  const computed = window.getComputedStyle(element);
+  const paddingVer = parseInt(computed.paddingTop) + parseInt(computed.paddingBottom);
+  const paddingHor = parseInt(computed.paddingLeft) + parseInt(computed.paddingRight);
+  const width = element.clientWidth - paddingHor;
+  const height = element.clientHeight - paddingVer;
+  return { width, height };
+}
+
 class MiraTable {
   constructor(container, options) {
     this.version = VERSION;
-    this.options = options;
-    this.store = new Store(this.options.data);
-    ReactDOM.render(<App store={this.store} />, container);
+    this.options = options || {};
+    const { width, height } = innerSize(container);
+    if (!this.options.width) this.options.width = width;
+    if (!this.options.height) this.options.height = height;
+    this.store = new Store(this.options);
+    ReactDOM.render(<App store={this.store}/>, container);
+  }
+
+  resize(width, height) {
+    [this.store.width, this.store.height] = [width, height];
+  }
+
+  get width() {
+    return this.store.width;
+  }
+
+  get height() {
+    return this.store.height;
   }
 
   get data() {

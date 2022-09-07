@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useLayer } from "react-laag";
 import "@glideapps/glide-data-grid/dist/index.css";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import "./App.less";
 
 const ColumnAddButton = styled.div`
     width: 120px;
@@ -61,6 +60,8 @@ margin: 3px 0px;
 const Menu = styled.div`
 box-shadow: 1px 2px 5px 2px rgb(51 51 51 / 15%);
 background-color: white;
+font-family: 'Lato', 'Source Sans Pro', Roboto, Helvetica, Arial, sans-serif;
+-webkit-font-smoothing: antialiased;
 `;
 
 const Row = styled.div``;
@@ -189,8 +190,7 @@ export const App = observer(({store}) => {
 
   return (
     <>
-      <div className="App">
-        <DataEditor width={600} height={200} ref={store.ref}
+      <DataEditor width={store.width} height={store.height} ref={store.ref}
         columns={store.columns} rows={store.data.length} 
         minColumnWidth={50} maxColumnWidth={350} 
         getCellContent={getContent} onCellEdited={onEdited} 
@@ -205,26 +205,25 @@ export const App = observer(({store}) => {
         keybindings={{search: true}} 
         getCellsForSelection={true} 
         rowMarkers="clickable-number"/>
-        {store.showMenu !== undefined &&
-        renderLayer(
-          <Menu
-            {...layerProps} 
-            style={{ ...layerProps.style }}>
-            {store.showMenu.items.map((item, i) => (
-              <Row key={`a${i}`}>
-                {typeof(item) === 'string' ? (
-                <MenuSepLine></MenuSepLine>
-                ) : (
-                <MenuItem onClick={() => {item.action();store.showMenu = undefined;}}>
-                  {item.title}
-                  {item.shortcut ? (<label>{item.shortcut}</label>) : ''}
-                </MenuItem>
-                )}
-              </Row>
-            ))}
-          </Menu>
-        )}
-      </div>
+      {store.showMenu !== undefined &&
+      renderLayer(
+        <Menu
+          {...layerProps} 
+          style={{ ...layerProps.style }}>
+          {store.showMenu.items.map((item, i) => (
+            <Row key={`a${i}`}>
+              {typeof(item) === 'string' ? (
+              <MenuSepLine></MenuSepLine>
+              ) : (
+              <MenuItem onClick={() => {item.action();store.showMenu = undefined;}}>
+                {item.title}
+                {item.shortcut ? (<label>{item.shortcut}</label>) : ''}
+              </MenuItem>
+              )}
+            </Row>
+          ))}
+        </Menu>
+      )}
     </>
   );
 });

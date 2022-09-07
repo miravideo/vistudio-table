@@ -4,11 +4,14 @@ import React from "react";
 import EventEmitter from "eventemitter3";
 
 class Store extends EventEmitter {
-  constructor(data) {
+  constructor(opt) {
     super();
+    const { width, height, data } = opt;
     this._id = 0;
     this.data = [];
     this.columns = [];
+    this.width = width || 100;
+    this.height = height || 100;
     this.selection = undefined;
     this.showMenu = undefined;
     this.visibleRange = undefined;
@@ -20,6 +23,8 @@ class Store extends EventEmitter {
     }
 
     makeObservable(this, {
+      width: observable,
+      height: observable,
       columns: observable,
       data: observable,
       selection: observable,
