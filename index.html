@@ -17,8 +17,7 @@ var row = new Array(8);
 for (let i = 0; i < row.length; i++) {
   row[i] = `${i+1}`;
 }
-var table = miratable(container, {data: [row, row], transpose: true});
+var table = miratable(container, {data: [row, row], transpose: true, align:'right'});
 </script>
 
-<div id="portal" style="position: fixed; left: 0; top: 0; z-index: 9999;" />
 </body></html>

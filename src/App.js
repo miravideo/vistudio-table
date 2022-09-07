@@ -71,10 +71,12 @@ export const App = observer(({store}) => {
     const [col, row] = cell;
     const ck = store.columns.map(c => c.id)[col];
     const d = store.data[row] ? store.data[row][ck] : '';
+    const align = store.align === 'auto' ? (isNaN(d) ? 'left' : 'right') : store.align;
     return {
       kind: GridCellKind.Text,
       allowOverlay: true,
       readonly: false,
+      contentAlign: align,
       displayData: d,
       data: d,
     };

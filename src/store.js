@@ -15,6 +15,7 @@ class Store extends EventEmitter {
     this.selection = undefined;
     this.showMenu = undefined;
     this.visibleRange = undefined;
+    this.align = opt.align || 'auto';
     this.ref = React.createRef();
 
     if (data && Array.isArray(data) && data.length > 0) {
@@ -23,6 +24,7 @@ class Store extends EventEmitter {
     }
 
     makeObservable(this, {
+      align: observable,
       width: observable,
       height: observable,
       columns: observable,
@@ -32,9 +34,9 @@ class Store extends EventEmitter {
     });
   }
 
-  emitChange() {
+  emitChange(emit=true) {
     const checksum = this.checksum();
-    if (this.lastCheckSum && checksum !== this.lastCheckSum) {
+    if (emit && this.lastCheckSum && checksum !== this.lastCheckSum) {
       this.emit('change');
     }
     this.lastCheckSum = checksum;
@@ -131,7 +133,7 @@ class Store extends EventEmitter {
     return `${prefix}${++this._id}`;
   }
 
-  write(target, values) {
+  write(target, values, emitChange=true) {
     const change = [];
     const maxCols = Math.max(...values.map(x => x.length));
     this.enlarge({ col: target[0] + maxCols, row: target[1] + values.length });
@@ -144,7 +146,7 @@ class Store extends EventEmitter {
       }
     }
     if (this.ref?.current) this.ref.current.updateCells(change);
-    this.emitChange();
+    this.emitChange(emitChange);
     return change;
   }
 

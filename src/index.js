@@ -24,6 +24,16 @@ class MiraTable {
     }
     this.store = new Store(this.options);
     ReactDOM.render(<App store={this.store}/>, container);
+
+    if (!document.getElementById('portal')) {
+      const portal = document.createElement('div');
+      portal.id = 'portal';
+      portal.style.position = 'fixed';
+      portal.style.left = '0';
+      portal.style.top = '0';
+      portal.style.zIndex = 9999;
+      document.body.append(portal);
+    }
   }
 
   resize(width, height) {
@@ -50,7 +60,8 @@ class MiraTable {
     this.store.columns = [];
     this.store.data = [];
     return this.store.write([0, 0], 
-      this.options.transpose ? this.transpose(data) : data);
+      this.options.transpose ? this.transpose(data) : data, 
+      !!this.options.emitOnSet);
   }
 
   transpose(data) {
