@@ -17,10 +17,11 @@ const innerSize = (element) => {
 class MiraTable {
   constructor(container, options) {
     this.version = VERSION;
-    this.options = options || {};
     const { width, height } = innerSize(container);
-    if (!this.options.width) this.options.width = width;
-    if (!this.options.height) this.options.height = height;
+    this.options = {width, height, ...(options || {})};
+    if (this.options.transpose && this.options.data) {
+      this.options.data = this.transpose(this.options.data);
+    }
     this.store = new Store(this.options);
     ReactDOM.render(<App store={this.store}/>, container);
   }
@@ -42,13 +43,22 @@ class MiraTable {
     while (data[data.length-1].every(x => x === '')) {
       data.splice(data.length-1, 1);
     }
-    return data;
+    return this.options.transpose ? this.transpose(data) : data;
   }
 
   set data(data) {
     this.store.columns = [];
     this.store.data = [];
-    return this.store.write([0, 0], data);
+    return this.store.write([0, 0], 
+      this.options.transpose ? this.transpose(data) : data);
+  }
+
+  transpose(data) {
+    return data[0].map((col, i) => {
+      return data.map((row) => {
+        return row[i];
+      })
+    });
   }
 
   on(event, callback) {

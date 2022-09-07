@@ -6,22 +6,18 @@
 </head>
 <body>
 <div style="display: flex;">
-  <div id="container" style="width:600px;height:300px"></div>
+  <div id="container" style="width:600px;height:300px;border:1px solid #CCC;"></div>
   <div id="mira-debug-container1" style="margin-left:5px; background: #fee; display: flex"></div>
 </div>
 <hr />
 <script src="dst/mira-table.js" charset="utf-8"></script>
 <script>
 var container = document.getElementById('container');
-var table = miratable(container, {data: [[1,2,3]]});
-
-console.log(table.data);
-table.data = [[3,2,1], [1,2,3], [5,6,6,8]];
-console.log(table.data);
-
-table.on('change', () => {
-  console.log(table.data);
-});
+var row = new Array(8);
+for (let i = 0; i < row.length; i++) {
+  row[i] = `${i+1}`;
+}
+var table = miratable(container, {data: [row, row], transpose: true});
 </script>
 
 <div id="portal" style="position: fixed; left: 0; top: 0; z-index: 9999;" />

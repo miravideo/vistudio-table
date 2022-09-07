@@ -204,14 +204,11 @@ class Store extends EventEmitter {
 
   colKey(n) {
     const nums26 = Array.from('ABCDEFGHIJKLMNOPQRSTVUWXYZ');
-    if (!n) return nums26[0];
     const arr = [];
-    while(n) {
+    while (n >= 0) {
       let res = n % 26;
-      //作为下标，对应的36进制数，转换成
       arr.unshift(nums26[res]);
-      //去掉个位
-      n = parseInt(n / 26);
+      n = parseInt(n / 26) - 1;
     }
     return arr.join('');
   }
