@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { App, getData, reloadData } from "./App.js";
+import { App } from "./App.js";
 import Store from "./store";
 
 const VERSION = '$VERSION';
