@@ -36,8 +36,6 @@
   "dependencies": {
     "@glideapps/glide-data-grid": "^5.0.0",
     "eventemitter3": "^4.0.7",
-    "lodash": "^4.17.21",
-    "marked": "^4.1.0",
     "md5": "^2.3.0",
     "mobx": "^6.6.1",
     "mobx-react-lite": "^3.4.0",
