@@ -34,7 +34,7 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
-    "@glideapps/glide-data-grid": "^5.0.0",
+    "@glideapps/glide-data-grid": "^5.2.1",
     "eventemitter3": "^4.0.7",
     "marked": "^4.3.0",
     "md5": "^2.3.0",

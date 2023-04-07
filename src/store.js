@@ -1,15 +1,25 @@
 import md5 from 'md5';
-import { makeObservable, observable } from 'mobx';
+import {makeObservable, observable} from 'mobx';
 import React from "react";
 import EventEmitter from "eventemitter3";
+
+class Cell extends EventEmitter {
+  constructor(opt) {
+    super()
+    const {value, file, type} = opt
+    this.value = value;
+    this.file = file;
+    this.type = type || 'text';
+  }
+}
 
 class Store extends EventEmitter {
   constructor(opt) {
     super();
-    const { width, height, data } = opt;
+    const { width, height, data, columns,} = opt;
     this._id = 0;
     this.data = [];
-    this.columns = [];
+    this.columns = columns;
     this.width = width || 100;
     this.height = height || 100;
     this.selection = undefined;
@@ -18,6 +28,7 @@ class Store extends EventEmitter {
     this.align = opt.align || 'auto';
     this.ref = React.createRef();
 
+    this.highLightCells = []
     if (data && Array.isArray(data) && data.length > 0) {
       // init data
       this.write([0, 0], data);
@@ -30,8 +41,13 @@ class Store extends EventEmitter {
       columns: observable,
       data: observable,
       selection: observable,
-      showMenu: observable
+      showMenu: observable,
+      highLightCells: observable
     });
+  }
+
+  emitSelect(sel) {
+    this.emit('select', {select: sel})
   }
 
   emitChange(emit=true) {
@@ -43,7 +59,34 @@ class Store extends EventEmitter {
   }
 
   checksum() {
-    return md5(JSON.stringify(this.data)) + md5(JSON.stringify(this.columns));
+    return md5(`${this.data}`);
+  }
+
+  getData(row=0) {
+    const items = []
+    for (let index in this.data[row]) {
+      const value = {value: this.data[row][index]};
+      value.columnInfo = this.columns[index]
+      items.push(value)
+    }
+
+    return items
+  }
+
+  showGroupMenu(col, row, {bounds, group}) {
+    const y = (row > this.visibleRange.y + (this.visibleRange.height * 0.5)) ? 'top' : 'bottom';
+    const x = 'start';
+    const items = [];
+    items.push({ title: 'Duplicate Scene', action: () => {
+      this.columns.push({title: 'media', group: 'scene 3'});
+      this.columns = [...this.columns];
+    }});
+    items.push({ title: 'Paste', shortcut: 'Ctrl+V', action: async () => {
+        const text = await navigator.clipboard.readText();
+        const data = text.split("\n").map(r => r.split('\t'));
+        this.write([col, row], data);
+      } });
+    if (items.length > 0) this.showMenu = { bounds, position: `${y}-${x}`, items };
   }
 
   menuShow(col, row) {
@@ -92,13 +135,13 @@ class Store extends EventEmitter {
       }});
       items.push({ title: 'Insert new column to left', action: () => {
         this.columns.splice(col, 0, { title: '', id: this.id() });
-        this.reorder();
+        // this.reorder();
         this.fillData();
         this.columns = [...this.columns];
       }});
       items.push({ title: 'Insert new column to right', action: () => {
         this.columns.splice(col + 1, 0, { title: '', id: this.id() });
-        this.reorder();
+        // this.reorder();
         this.fillData();
         this.columns = [...this.columns];
       }});
@@ -112,7 +155,7 @@ class Store extends EventEmitter {
       for (let i of new Array(size.col - this.columns.length)) {
         this.columns.push({ title: '.', id: this.id()});
       }
-      this.reorder();
+      // this.reorder();
       addCols = true;
     }
 
@@ -137,14 +180,14 @@ class Store extends EventEmitter {
     const change = [];
     const maxCols = Math.max(...values.map(x => x.length));
     this.enlarge({ col: target[0] + maxCols, row: target[1] + values.length });
-    const cids = this.columns.map(c => c.id);
     for (let row=0; row < values.length; row++) {
       for (let col=0; col < values[row].length; col++) {
-        const ck = cids[target[0] + col];
-        this.data[target[1] + row][ck] = `${values[row][col]}`;
+        const ck = target[0] + col;
+        this.data[target[1] + row][ck] = new Cell(values[row][col]);
         change.push({cell: [target[0] + col, target[1] + row]});
       }
     }
+    this.data = [...this.data]
     if (this.ref?.current) this.ref.current.updateCells(change);
     this.emitChange(emitChange);
     return change;
@@ -193,16 +236,17 @@ class Store extends EventEmitter {
 
   fillData() {
     this.data.map(row => {
-      this.columns.map(x => row[x.id] = (row[x.id] !== undefined ? row[x.id] : ''));
+      this.columns.map((x, index) => row[index] = (row[index] !== undefined ? row[index] : {value: ''}));
     });
     this.data = [...this.data];
   }
 
-  reorder() {
-    for (let i = 0; i < this.columns.length; i++) {
-      this.columns[i].title = this.colKey(i);
-    }
-  }
+  // reorder() {
+  //   for (let i = 0; i < this.columns.length; i++) {
+  //     this.columns[i].title = this.titles[i].title || this.colKey(i);
+  //     this.columns[i].group = this.titles[i].group || this.colKey(i);
+  //   }
+  // }
 
   colKey(n) {
     const nums26 = Array.from('ABCDEFGHIJKLMNOPQRSTVUWXYZ');
