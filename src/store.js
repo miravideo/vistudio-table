@@ -174,7 +174,7 @@ class Store extends EventEmitter {
     for (let row=0; row < values.length; row++) {
       for (let col=0; col < values[row].length; col++) {
         const ck = target[0] + col;
-        this.data[target[1] + row][ck] = new Cell(values[row][col]);
+        this.data[target[1] + row][ck] = new Cell({value: (values[row][col].value || values[row][col])});
         change.push({cell: [target[0] + col, target[1] + row]});
       }
     }
@@ -227,7 +227,7 @@ class Store extends EventEmitter {
 
   fillData() {
     this.data.map(row => {
-      this.columns.map((x, index) => row[index] = (row[index] !== undefined ? row[index] : {value: ''}));
+      this.columns.map((x, index) => row[index] = (row[index] !== undefined ? row[index] : new Cell({value: ''})));
     });
     this.data = [...this.data];
   }
