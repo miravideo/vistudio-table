@@ -32,11 +32,13 @@ const ColumnAddButton = styled.div`
   }
 `;
 
-const cover = (video) => {
+const cover = (videoUrl) => {
   return new Promise((resolve) => {
+    const video = document.createElement('video');
     video.addEventListener('canplay', () => {
       video.currentTime = 0.1;
     }, {once: true})
+    video.src = videoUrl;
     video.addEventListener('seeked', () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext('2d');
@@ -45,6 +47,7 @@ const cover = (video) => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const image = canvas.toDataURL("image/jpeg")
       resolve(image)
+      video.src = '';
     }, {once: true})
   })
 }
