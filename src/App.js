@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import {useLayer} from "react-laag";
 import "@glideapps/glide-data-grid/dist/index.css";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import {Cell} from "./base";
 
 const ColumnAddButton = styled.div`
   width: 120px;
@@ -113,10 +114,19 @@ export const App = observer(({store}) => {
 
   const onEdited = React.useCallback((cell, newValue) => {
     // we only have text cells, might as well just die here.
-    if (newValue.kind !== GridCellKind.Text) return;
     const [col, row] = cell;
-    if (!store.data[row][col]) store.data[row][col] = {}
-    store.data[row][col].value = newValue.data;
+    if (newValue.kind === GridCellKind.Image) {
+      if (!store.data[row][col]) store.data[row][col] = new Cell({value: '', type: 'image'})
+      store.data[row][col].value = newValue.data;
+      if (newValue.data.length === 0) {
+        store.data[row][col].type = 'text'
+      }
+
+    } else if (newValue.kind === GridCellKind.Text) {
+      if (!store.data[row][col]) store.data[row][col] = new Cell({value: ''})
+      store.data[row][col].value = newValue.data;
+    }
+    store.data = [...store.data]
     store.emitChange();
   })
 

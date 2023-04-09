@@ -2,16 +2,7 @@ import md5 from 'md5';
 import {makeObservable, observable} from 'mobx';
 import React from "react";
 import EventEmitter from "eventemitter3";
-
-class Cell extends EventEmitter {
-  constructor(opt) {
-    super()
-    const {value, file, type} = opt
-    this.value = value;
-    this.file = file;
-    this.type = type || 'text';
-  }
-}
+import {Cell} from "./base";
 
 class Store extends EventEmitter {
   constructor(opt) {
