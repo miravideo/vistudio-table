@@ -64,18 +64,13 @@ class Store extends EventEmitter {
     return items
   }
 
-  showGroupMenu(col, row, {bounds, group}) {
+  async showGroupMenu(col, row, {bounds, group}) {
     const y = (row > this.visibleRange.y + (this.visibleRange.height * 0.5)) ? 'top' : 'bottom';
     const x = 'start';
     const items = [];
     items.push({ title: 'Duplicate Scene', action: () => {
       this.emit('duplicateScene', col)
     }});
-    items.push({ title: 'Paste', shortcut: 'Ctrl+V', action: async () => {
-        const text = await navigator.clipboard.readText();
-        const data = text.split("\n").map(r => r.split('\t'));
-        this.write([col, row], data);
-      } });
     if (items.length > 0) this.showMenu = { bounds, position: `${y}-${x}`, items };
   }
 
@@ -87,13 +82,19 @@ class Store extends EventEmitter {
     items.push({ title: 'Copy', shortcut: 'Ctrl+C', action: () => {
       if (!this.selection) return;
       const data = this.getSelectionData();
-      const text = data.map(row => row.join('\t')).join('\n');
+      const text = data.map(row => row.join('\t')).join('\r\n');
       // console.log(`copied\n${text}`);
       navigator.clipboard.writeText(text);
     } });
     items.push({ title: 'Paste', shortcut: 'Ctrl+V', action: async () => {
       const text = await navigator.clipboard.readText();
-      const data = text.split("\n").map(r => r.split('\t'));
+      const data = text.split("\r\n").map(r => {
+        const cell = r.split('\t');
+        return cell.map(item => {
+          if (item.includes('\n')) return item.substring(1, item.length - 2);
+          return item
+        })
+      });
       // console.log('paste', data, text);
       this.write([col, row], data);
     } });
