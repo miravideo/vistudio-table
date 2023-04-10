@@ -69,8 +69,7 @@ class Store extends EventEmitter {
     const x = 'start';
     const items = [];
     items.push({ title: 'Duplicate Scene', action: () => {
-      this.columns.push({title: 'media', group: 'scene 3'});
-      this.columns = [...this.columns];
+      this.emit('duplicateScene', col)
     }});
     items.push({ title: 'Paste', shortcut: 'Ctrl+V', action: async () => {
         const text = await navigator.clipboard.readText();
