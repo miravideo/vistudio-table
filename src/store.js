@@ -71,6 +71,9 @@ class Store extends EventEmitter {
     items.push({ title: 'Duplicate Scene', action: () => {
       this.emit('duplicateScene', col)
     }});
+    items.push({ title: 'Set Duration', action: () => {
+        this.emit('setDuration', col)
+      }});
     if (items.length > 0) this.showMenu = { bounds, position: `${y}-${x}`, items };
   }
 
@@ -78,7 +81,7 @@ class Store extends EventEmitter {
     const bounds = this.ref.current.getBounds(col, row);
     const y = (row > this.visibleRange.y + (this.visibleRange.height * 0.5)) ? 'top' : 'bottom';
     const x = /*(col > this.visibleRange.x + (this.visibleRange.width * 0.5)) ? 'end' : */'start';
-    const items = [];
+    let items = [];
     items.push({ title: 'Copy', shortcut: 'Ctrl+C', action: () => {
       if (!this.selection) return;
       const data = this.getSelectionData();
@@ -99,43 +102,45 @@ class Store extends EventEmitter {
       this.write([col, row], data);
     } });
     if (col < 0) {
-      items.push('-');
-      items.push({ title: 'Delete row', action: () => {
-        this.data.splice(row, 1);
-        this.data = [...this.data];
-      }});
-      items.push({ title: 'Insert new row above', action: () => {
-        this.data.splice(row, 0, this.newRow());
-        this.data = [...this.data];
-      }});
-      items.push({ title: 'Insert new row below', action: () => {
-        this.data.splice(row + 1, 0, this.newRow());
-        this.data = [...this.data];
-      }});
+      items = [];
+      // items.push('-');
+      // items.push({ title: 'Delete row', action: () => {
+      //   this.data.splice(row, 1);
+      //   this.data = [...this.data];
+      // }});
+      // items.push({ title: 'Insert new row above', action: () => {
+      //   this.data.splice(row, 0, this.newRow());
+      //   this.data = [...this.data];
+      // }});
+      // items.push({ title: 'Insert new row below', action: () => {
+      //   this.data.splice(row + 1, 0, this.newRow());
+      //   this.data = [...this.data];
+      // }});
     } else if (row < 0) {
-      items.push('-');
-      items.push({ title: 'Delete column', action: () => {
-        const del = this.columns.splice(col, 1);
-        this.columns = [...this.columns];
-        if (del && del[0]) {
-          this.data.map(row => {
-            if (row[del[0].id] !== undefined) delete row[del[0].id];
-          });
-          this.data = [...this.data];
-        }
-      }});
-      items.push({ title: 'Insert new column to left', action: () => {
-        this.columns.splice(col, 0, { title: '', id: this.id() });
-        // this.reorder();
-        this.fillData();
-        this.columns = [...this.columns];
-      }});
-      items.push({ title: 'Insert new column to right', action: () => {
-        this.columns.splice(col + 1, 0, { title: '', id: this.id() });
-        // this.reorder();
-        this.fillData();
-        this.columns = [...this.columns];
-      }});
+      items = [];
+      // items.push('-');
+      // items.push({ title: 'Delete column', action: () => {
+      //   const del = this.columns.splice(col, 1);
+      //   this.columns = [...this.columns];
+      //   if (del && del[0]) {
+      //     this.data.map(row => {
+      //       if (row[del[0].id] !== undefined) delete row[del[0].id];
+      //     });
+      //     this.data = [...this.data];
+      //   }
+      // }});
+      // items.push({ title: 'Insert new column to left', action: () => {
+      //   this.columns.splice(col, 0, { title: '', id: this.id() });
+      //   // this.reorder();
+      //   this.fillData();
+      //   this.columns = [...this.columns];
+      // }});
+      // items.push({ title: 'Insert new column to right', action: () => {
+      //   this.columns.splice(col + 1, 0, { title: '', id: this.id() });
+      //   // this.reorder();
+      //   this.fillData();
+      //   this.columns = [...this.columns];
+      // }});
     }
     if (items.length > 0) this.showMenu = { bounds, position: `${y}-${x}`, items };
   }
