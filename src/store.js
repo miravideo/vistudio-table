@@ -68,12 +68,15 @@ class Store extends EventEmitter {
     const y = (row > this.visibleRange.y + (this.visibleRange.height * 0.5)) ? 'top' : 'bottom';
     const x = 'start';
     const items = [];
-    items.push({ title: 'Duplicate Scene', action: () => {
-      this.emit('duplicateScene', col)
-    }});
-    items.push({ title: 'Set Duration', action: () => {
+    if (`${this.columns[col].group}`.includes('Scene')) {
+      items.push({ title: 'Duplicate Scene', action: () => {
+        this.emit('duplicateScene', col)
+      }});
+      items.push({ title: 'Set Duration', action: () => {
         this.emit('setDuration', col)
       }});
+    }
+
     if (items.length > 0) this.showMenu = { bounds, position: `${y}-${x}`, items };
   }
 

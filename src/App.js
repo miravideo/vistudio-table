@@ -192,7 +192,7 @@ export const App = observer(({store}) => {
 
   const onHeaderMenu = React.useCallback((col, evt) => {
     evt.preventDefault();
-    // store.selection = undefined;
+    store.selection = undefined;
     if (!store.selection?.columns?.length && store.selection?.current?.cell) {
       store.selection = undefined;
       return;
@@ -202,7 +202,7 @@ export const App = observer(({store}) => {
 
   const onGroupMenu = React.useCallback((col, evt) => {
     evt.preventDefault();
-    // store.selection = undefined;
+    store.selection = undefined;
     if (!store.selection?.columns?.length && store.selection?.current?.cell) {
       store.selection = undefined;
       return;
