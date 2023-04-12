@@ -121,6 +121,9 @@ class Store extends EventEmitter {
       // }});
     } else if (row < 0) {
       items = [];
+      items.push({ title: 'Set Text', action: () => {
+        this.emit('setText', this.columns[col])
+      }});
       // items.push('-');
       // items.push({ title: 'Delete column', action: () => {
       //   const del = this.columns.splice(col, 1);
