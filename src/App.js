@@ -109,7 +109,7 @@ export const App = observer(({store}) => {
       kind: GridCellKind.Text,
       allowOverlay: true,
       readonly: false,
-      contentAlign: align,
+      contentAlign: 'left',
       displayData: d?.value || '',
       data: d?.value || '',
     };
