@@ -179,7 +179,8 @@ class Store extends EventEmitter {
     for (let row=0; row < values.length; row++) {
       for (let col=0; col < values[row].length; col++) {
         const ck = target[0] + col;
-        this.data[target[1] + row][ck] = new Cell({value: (values[row][col].value || values[row][col])});
+        const value = values[row][col].value !== undefined ? values[row][col] : {value: values[row][col]}
+        this.data[target[1] + row][ck] = new Cell(value);
         change.push({cell: [target[0] + col, target[1] + row]});
       }
     }
