@@ -22,7 +22,6 @@
     "@rbarilani/remove-source-map-url-webpack-plugin": "^1.1.0",
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^10.0.0",
-    "cos-nodejs-sdk-v5": "^2.11.6",
     "css-loader": "^6.5.1",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
