@@ -13,11 +13,23 @@
 <script src="dst/mira-table.js" charset="utf-8"></script>
 <script>
 var container = document.getElementById('container');
-var row = new Array(8);
-for (let i = 0; i < row.length; i++) {
-  row[i] = `${i+1}`;
+var data = [];
+for (let j = 0; j < 5; j++) {
+  var row = new Array(8);
+  for (let i = 0; i < row.length; i++) {
+    row[i] = `${j}.${i+1}`;
+  }
+  data.push(row);
 }
-var table = miratable(container, {data: [row, row], transpose: true, align:'right'});
+var table = miratable(container, {data, transpose: true, align:'right'});
+
+table.on('select', async (e) => {
+  const row = e.select.current?.cell[1];
+  console.log('row', row);
+  if (row === undefined) return;
+  const data = table.getRow(row);
+  console.log('select', data);
+});
 </script>
 
 </body></html>

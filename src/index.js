@@ -48,6 +48,14 @@ class MiraTable {
     return this.store.height;
   }
 
+  get columns() {
+    return this.store.columns;
+  }
+
+  get rows() {
+    return this.store.data.length;
+  }
+
   get data() {
     const data = this.store.rowData();
     while (data[data.length-1].every(x => x === '')) {
@@ -62,6 +70,10 @@ class MiraTable {
     return this.store.write([0, 0], 
       this.options.transpose ? this.transpose(data) : data, 
       !!this.options.emitOnSet);
+  }
+
+  getRow(rowIdx) {
+    return this.store.getRow(rowIdx);
   }
 
   transpose(data) {

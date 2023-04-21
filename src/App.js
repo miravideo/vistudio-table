@@ -94,8 +94,8 @@ const Row = styled.div``;
 export const App = observer(({store}) => {
   const getContent = React.useCallback((cell) => {
     const [col, row] = cell;
-    // const ck = store.columns.map(c => c.id)[col];
-    const d = store.data[row] ? store.data[row][col] : '';
+    const ck = store.columns.map(c => c.id)[col];
+    const d = store.data[row] ? store.data[row][ck] : '';
     const align = store.align === 'auto' ? (isNaN(d) ? 'left' : 'right') : store.align;
     if (d?.type === 'video' || d?.type === 'image') {
       return {
@@ -116,18 +116,17 @@ export const App = observer(({store}) => {
   });
 
   const onEdited = React.useCallback((cell, newValue) => {
-    // we only have text cells, might as well just die here.
     const [col, row] = cell;
+    const ck = store.columns.map(c => c.id)[col];
     if (newValue.kind === GridCellKind.Image) {
-      if (!store.data[row][col]) store.data[row][col] = new Cell({value: '', type: 'image'})
-      store.data[row][col].value = newValue.data;
+      if (!store.data[row][ck]) store.data[row][ck] = new Cell({value: '', type: 'image'})
+      store.data[row][ck].value = newValue.data;
       if (newValue.data.length === 0) {
         store.data[row][col].type = 'text'
       }
-
     } else if (newValue.kind === GridCellKind.Text) {
-      if (!store.data[row][col]) store.data[row][col] = new Cell({value: ''})
-      store.data[row][col].value = newValue.data;
+      if (!store.data[row][ck]) store.data[row][ck] = new Cell({value: ''})
+      store.data[row][ck].value = newValue.data;
     }
     store.data = [...store.data]
     store.emitChange();
@@ -137,6 +136,12 @@ export const App = observer(({store}) => {
     [store.columns[endIndex], store.columns[startIndex]] = [store.columns[startIndex], store.columns[endIndex]];
     store.reorder();
     store.columns = [...store.columns];
+    store.emitChange();
+  })
+
+  const onRowMove = React.useCallback((startIndex, endIndex) => {
+    const row = store.data.splice(startIndex, 1)[0];
+    store.data.splice(endIndex, 0, row);
     store.emitChange();
   })
 
@@ -200,15 +205,15 @@ export const App = observer(({store}) => {
     store.menuShow(col, -1);
   })
 
-  const onGroupMenu = React.useCallback((col, evt) => {
-    evt.preventDefault();
-    store.selection = undefined;
-    if (!store.selection?.columns?.length && store.selection?.current?.cell) {
-      store.selection = undefined;
-      return;
-    }
-    store.showGroupMenu(col, -1, evt);
-  })
+  // const onGroupMenu = React.useCallback((col, evt) => {
+  //   evt.preventDefault();
+  //   store.selection = undefined;
+  //   if (!store.selection?.columns?.length && store.selection?.current?.cell) {
+  //     store.selection = undefined;
+  //     return;
+  //   }
+  //   store.showGroupMenu(col, -1, evt);
+  // })
 
   const onSelect = React.useCallback((sel) => {
     store.selection = sel;
@@ -284,11 +289,12 @@ export const App = observer(({store}) => {
                     onFinishedEditing={onFinishEdit} onPaste={onPaste}
                     onColumnMoved={onColMove} onColumnResize={onColResize}
                     onRowAppended={onRowAppend}
+                    onRowMoved={onRowMove}
                     highlightRegions={store.highLightCells}
                     onDrop={onDrop}
                     onCellContextMenu={onCellMenu}
                     onHeaderContextMenu={onHeaderMenu}
-                    onGroupHeaderContextMenu={onGroupMenu}
+                    // onGroupHeaderContextMenu={onGroupMenu}
                     onVisibleRegionChanged={onVisibleChanged}
                     onGridSelectionChange={onSelect} gridSelection={store.selection}
                     onDragOverCell={onDragOverCell}
@@ -297,7 +303,7 @@ export const App = observer(({store}) => {
                     smoothScrollY={true}
                     keybindings={{search: true}}
                     getCellsForSelection={true}
-                    isDraggable={true}
+                    isDraggable={false} // 先disable，之后改为拖文件之后再动态打开
                     rowMarkers="both"/>
         {store.showMenu !== undefined &&
             renderLayer(
