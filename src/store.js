@@ -15,6 +15,7 @@ class Store extends EventEmitter {
     this.height = height || 100;
     this.selection = undefined;
     this.showMenu = undefined;
+    this.headerInput = undefined;
     this.visibleRange = undefined;
     this.align = opt.align || 'auto';
     this.ref = React.createRef();
@@ -33,6 +34,7 @@ class Store extends EventEmitter {
       data: observable,
       selection: observable,
       showMenu: observable,
+      headerInput: observable,
       highLightCells: observable
     });
   }
@@ -80,6 +82,11 @@ class Store extends EventEmitter {
 
   //   if (items.length > 0) this.showMenu = { bounds, position: `${y}-${x}`, items };
   // }
+
+  headerInputShow(col) {
+    const bounds = this.ref.current.getBounds(col, 0);
+    this.headerInput = { col, bounds, time: Date.now() };
+  }
 
   menuShow(col, row) {
     const bounds = this.ref.current.getBounds(col, row);

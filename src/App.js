@@ -89,6 +89,21 @@ const Menu = styled.div`
   -webkit-font-smoothing: antialiased;
 `;
 
+const HeaderInput = styled.div`
+
+input {
+  box-sizing: border-box;
+  outline: none;
+  backgound: #FFF;
+  border: 1px solid #66F;
+  border-radius: 3px;
+  box-shadow: 1px 2px 5px 2px rgb(51 51 51 / 15%);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 5px;
+}
+`;
+
 const Row = styled.div``;
 
 export const App = observer(({store}) => {
@@ -133,7 +148,8 @@ export const App = observer(({store}) => {
   })
 
   const onColMove = React.useCallback((startIndex, endIndex) => {
-    [store.columns[endIndex], store.columns[startIndex]] = [store.columns[startIndex], store.columns[endIndex]];
+    const col = store.columns.splice(startIndex, 1)[0];
+    store.columns.splice(endIndex, 0, col);
     store.reorder();
     store.columns = [...store.columns];
     store.emitChange();
@@ -199,10 +215,27 @@ export const App = observer(({store}) => {
     evt.preventDefault();
     store.selection = undefined;
     if (!store.selection?.columns?.length && store.selection?.current?.cell) {
-      store.selection = undefined;
+      // store.selection = undefined;
       return;
     }
     store.menuShow(col, -1);
+  })
+
+  const onHeaderClick = React.useCallback((col, evt) => {
+    evt.preventDefault();
+    if (store.prevHeaderClick?.col === col && Date.now() - store.prevHeaderClick?.time < 600) {
+      // console.log('onHeaderDbClick');
+      store.headerInputShow(col, evt.bounds);
+    }
+    store.prevHeaderClick = { col, time: Date.now() };
+  })
+
+  const onColumnAdd = React.useCallback((evt) => {
+    evt.preventDefault();
+    store.columns.push({ title: '', id: store.id() });
+    store.reorder();
+    store.fillData();
+    store.columns = [...store.columns];
   })
 
   // const onGroupMenu = React.useCallback((col, evt) => {
@@ -245,6 +278,30 @@ export const App = observer(({store}) => {
     placement: store.showMenu?.position || "bottom-start",
     auto: true,
     possiblePlacements: ["bottom-start", "bottom-end", "top-start", "top-end"],
+  });
+
+  const {renderLayer: renderHeaderInput, layerProps: headerInputProps} = useLayer({
+    isOpen: store.headerInput !== undefined,
+    triggerOffset: 0,
+    onOutsideClick: () => {
+      // todo: hide when scroll
+      // debounce, since evt could not stopPropagation
+      if (Date.now() - store.headerInput?.time < 500) return;
+      store.headerInput = undefined
+    },
+    trigger: {
+      getBounds: () => ({
+        bottom: (store.headerInput?.bounds.y ?? 0) + (store.headerInput?.bounds.height ?? 0),
+        height: store.headerInput?.bounds.height ?? 0,
+        left: store.headerInput?.bounds.x ?? 0,
+        right: (store.headerInput?.bounds.x ?? 0) + (store.headerInput?.bounds.width ?? 0),
+        top: store.headerInput?.bounds.y ?? 0,
+        width: store.headerInput?.bounds.width ?? 0,
+      }),
+    },
+    placement: "top-start",
+    auto: true,
+    possiblePlacements: ["top-start"],
   });
 
   const onDragOverCell = React.useCallback((cell) => {
@@ -293,6 +350,7 @@ export const App = observer(({store}) => {
                     highlightRegions={store.highLightCells}
                     onDrop={onDrop}
                     onCellContextMenu={onCellMenu}
+                    onHeaderClicked={onHeaderClick}
                     onHeaderContextMenu={onHeaderMenu}
                     // onGroupHeaderContextMenu={onGroupMenu}
                     onVisibleRegionChanged={onVisibleChanged}
@@ -301,6 +359,15 @@ export const App = observer(({store}) => {
                     trailingRowOptions={{hint: ""}}
                     smoothScrollX={true}
                     smoothScrollY={true}
+                    rightElement={
+                    <ColumnAddButton>
+                      <button onClick={onColumnAdd}>+</button>
+                    </ColumnAddButton>
+                    }
+                    rightElementProps={{
+                      fill: false,
+                      sticky: false,
+                    }}
                     keybindings={{search: true}}
                     getCellsForSelection={true}
                     isDraggable={false} // 先disable，之后改为拖文件之后再动态打开
@@ -326,6 +393,27 @@ export const App = observer(({store}) => {
                       </Row>
                   ))}
                 </Menu>
+            )}
+        {store.headerInput !== undefined &&
+            renderHeaderInput(
+                <HeaderInput
+                    {...headerInputProps}
+                    style={{...headerInputProps.style}}>
+                  <input value={store.columns[store.headerInput.col].title} style={{
+                    width: store.headerInput.bounds.width,
+                    height: store.headerInput.bounds.height + 2
+                  }} onChange={e => {
+                    store.columns[store.headerInput.col].title = e.target.value;
+                  }} onBlur={e => {
+                    store.columns[store.headerInput.col].title = `${e.target.value}`.trim();
+                    store.headerInput = undefined;
+                    store.columns = [...store.columns]
+                  }} onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === 'Escape') {
+                      e.target.blur();
+                    }
+                  }} autoFocus={true}></input>
+                </HeaderInput>
             )}
       </div>
   );
