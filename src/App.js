@@ -92,15 +92,17 @@ const Menu = styled.div`
 const HeaderInput = styled.div`
 
 input {
-  box-sizing: border-box;
-  outline: none;
-  backgound: #FFF;
-  border: 1px solid #66F;
-  border-radius: 3px;
+  box-sizing: border-box !important;
+  outline: none !important;
+  backgound: #FFF !important;
+  border: 1px solid #66F !important;
+  border-radius: 3px !important;
   box-shadow: 1px 2px 5px 2px rgb(51 51 51 / 15%);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 0 5px;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-family: Helvetica, Arial, sans-serif !important;
+  padding: 0 5px !important;
+  color: #333 !important;
 }
 `;
 
@@ -404,10 +406,9 @@ export const App = observer(({store}) => {
                     height: store.headerInput.bounds.height + 2
                   }} onChange={e => {
                     store.columns[store.headerInput.col].title = e.target.value;
+                    store.columns = [...store.columns];
                   }} onBlur={e => {
-                    store.columns[store.headerInput.col].title = `${e.target.value}`.trim();
                     store.headerInput = undefined;
-                    store.columns = [...store.columns]
                   }} onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === 'Escape') {
                       e.target.blur();
