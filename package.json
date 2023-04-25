@@ -41,6 +41,6 @@
     "react-laag": "^2.0.4",
     "react-responsive-carousel": "^3.2.23",
     "styled-components": "^5.3.5",
-    "vistudio-table": "^5.2.2"
+    "vistudio-table": "^5.2.3"
   }
 }
