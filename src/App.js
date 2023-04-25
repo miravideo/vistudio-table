@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {observer} from 'mobx-react-lite';
-import DataEditor, {GridCellKind} from "@glideapps/glide-data-grid";
+import DataEditor, {GridCellKind} from "vistudio-table";
 import styled from 'styled-components';
 import {useLayer} from "react-laag";
-import "@glideapps/glide-data-grid/dist/index.css";
+import "vistudio-table/dist/index.css";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import {Cell} from "./base";
 
