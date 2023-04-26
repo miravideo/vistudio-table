@@ -4,6 +4,85 @@ import React from "react";
 import EventEmitter from "eventemitter3";
 import {Cell} from "./base";
 
+function parseCopiedTextTo2DArray(text) {
+  // 状态枚举
+  const State = {
+    NORMAL: 'normal',
+    IN_QUOTE: 'in_quo',
+    IN_QUOTE_ESCAPE: 'in_quo_esc',
+  };
+
+  // 状态变量
+  let state = State.NORMAL;
+  let row = [];
+  let cell = '';
+  const result = [];
+
+  // 状态转移函数
+  function transition(char) {
+    switch (state) {
+      case State.NORMAL:
+        if (char === '"') {
+          state = State.IN_QUOTE;
+        } else if (char === '\t') {
+          row.push(cell);
+          cell = '';
+        } else if (char === '\r') {
+        } else if (char === '\n') {
+          row.push(cell);
+          result.push(row);
+          row = [];
+          cell = '';
+        } else {
+          cell += char;
+        }
+        break;
+      case State.IN_QUOTE:
+        if (char === '"') {
+          state = State.IN_QUOTE_ESCAPE;
+        } else {
+          cell += char;
+        }
+        break;
+      case State.IN_QUOTE_ESCAPE:
+        if (char === '"') {
+          cell += char;
+          state = State.IN_QUOTE;
+        } else if (char === '\t') {
+          row.push(cell);
+          cell = '';
+          state = State.NORMAL;
+        } else if (char === '\r') {
+        } else if (char === '\n') {
+          row.push(cell);
+          result.push(row);
+          row = [];
+          cell = '';
+          state = State.NORMAL;
+        } else {
+          cell += '"' + char;
+          state = State.NORMAL;
+        }
+        break;
+    }
+  }
+
+  // 处理文本
+  for (let i = 0; i < text.length; i++) {
+    transition(text.charAt(i));
+  }
+
+  // 处理剩余的单元格和行
+  if (cell !== '') {
+    row.push(cell);
+  }
+  if (row.length > 0) {
+    result.push(row);
+  }
+
+  return result;
+}
+
 class Store extends EventEmitter {
   constructor(opt) {
     super();
@@ -102,13 +181,7 @@ class Store extends EventEmitter {
     } });
     items.push({ title: 'Paste', shortcut: 'Ctrl+V', action: async () => {
       const text = await navigator.clipboard.readText();
-      const data = text.split("\r\n").map(r => {
-        const cell = r.split('\t');
-        return cell.map(item => {
-          if (item.includes('\n')) return item.substring(1, item.length - 2);
-          return item
-        })
-      });
+      const data = parseCopiedTextTo2DArray(text);
       // console.log('paste', data, text);
       this.write([col, row], data);
     } });
