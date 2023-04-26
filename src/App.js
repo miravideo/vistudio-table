@@ -139,7 +139,7 @@ export const App = observer(({store}) => {
       if (!store.data[row][ck]) store.data[row][ck] = new Cell({value: '', type: 'image'})
       store.data[row][ck].value = newValue.data;
       if (newValue.data.length === 0) {
-        store.data[row][col].type = 'text'
+        store.data[row][ck].type = 'text'
       }
     } else if (newValue.kind === GridCellKind.Text) {
       if (!store.data[row][ck]) store.data[row][ck] = new Cell({value: ''})

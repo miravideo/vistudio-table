@@ -11,9 +11,9 @@ export class Cell extends EventEmitter {
     this.value = value;
     this.file = file;
 
-    if (!type && isImageUrl(this.value)) {
-      type = 'image'
-    }
+    // if (!type && isImageUrl(this.value)) {
+    //   type = 'image'
+    // }
 
     this.type = type || 'text';
 
