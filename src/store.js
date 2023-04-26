@@ -68,17 +68,13 @@ function parseCopiedTextTo2DArray(text) {
   }
 
   // 处理文本
-  for (let i = 0; i < text.length; i++) {
-    transition(text.charAt(i));
+  for (const char of Array.from(text)) {
+    transition(char);
   }
 
   // 处理剩余的单元格和行
-  if (cell !== '') {
-    row.push(cell);
-  }
-  if (row.length > 0) {
-    result.push(row);
-  }
+  if (cell !== '') row.push(cell);
+  if (row.length > 0) result.push(row);
 
   return result;
 }
